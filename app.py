@@ -97,6 +97,11 @@ if os.path.exists(DATA_FILE):
         
         st.dataframe(pd.DataFrame(display_holdings), use_container_width=True)
         
+        # Debug Info
+        if summary.debug_info and summary.debug_info.get("ignored_operations"):
+            st.warning(f"⚠️ Some rows were ignored: {summary.debug_info['ignored_operations']}")
+            st.info("Supported operations: 'Compra', 'Venta'. Check your CSV 'Operacion' column.")
+        
     except Exception as e:
         st.error(f"Error processing data: {str(e)}")
 else:

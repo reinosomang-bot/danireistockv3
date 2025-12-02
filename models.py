@@ -30,3 +30,4 @@ class PortfolioSummary(BaseModel):
     total_realized_pl_eur: float
     irr: float
     holdings: List[Holding]
+    debug_info: Optional[dict] = None

@@ -9,7 +9,14 @@ def parse_csv(file_path: str) -> pd.DataFrame:
     """
     Parses the CSV file and returns a cleaned DataFrame.
     """
-    df = pd.read_csv(file_path)
+    # Try reading with different separators
+    try:
+        df = pd.read_csv(file_path, sep=None, engine='python')
+    except:
+        try:
+            df = pd.read_csv(file_path, sep=';')
+        except:
+            df = pd.read_csv(file_path, sep=',')
     
     # Normalize column names
     df.columns = [c.strip() for c in df.columns]
@@ -172,11 +179,38 @@ def calculate_portfolio(df: pd.DataFrame) -> PortfolioSummary:
         except:
             irr = 0.0
 
+    # ... (previous code)
+    
+    # Track ignored operations for debugging
+    ignored_ops = {}
+    
+    for _, row in df.iterrows():
+        # Handle potential NaN in Operacion
+        if pd.isna(row['Operacion']):
+            continue
+            
+        op_type = str(row['Operacion']).lower()
+        # ... (existing logic)
+        
+        if 'compra' in op_type:
+            # ... (existing buy logic)
+            pass
+        elif 'venta' in op_type:
+            # ... (existing sell logic)
+            pass
+        else:
+            if op_type not in ignored_ops:
+                ignored_ops[op_type] = 0
+            ignored_ops[op_type] += 1
+
+    # ... (rest of calculation)
+
     return PortfolioSummary(
         total_value_eur=total_value_eur,
         total_invested_eur=total_invested_eur,
         total_unrealized_pl_eur=total_unrealized_pl_eur,
         total_realized_pl_eur=total_realized_pl_eur,
         irr=irr if not np.isnan(irr) else 0.0,
-        holdings=final_holdings
+        holdings=final_holdings,
+        debug_info={"ignored_operations": ignored_ops, "total_rows": len(df)}
     )
